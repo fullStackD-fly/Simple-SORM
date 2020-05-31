@@ -76,28 +76,27 @@ public class MySqlQuery extends Query {
     }
 
     @Override
-    public List queryRows(String sql, Class clazz, Object[] params) {
-         Connection conn = DBManager.getConn();
-         List list=new ArrayList();
-         PreparedStatement ps=null;
-         ResultSet rs=null;
-        try {
-            ps=conn.prepareStatement(sql);
-            JDBCUtils.handleParamms(ps,params);
-            rs=ps.executeQuery();
-            ResultSetMetaData metaData = rs.getMetaData();
-            while (rs.next()){
-                Object object=clazz.newInstance();
-                for (int i=0;i<metaData.getColumnCount();i++) {
-                   String columnName=metaData.getColumnLabel(i+1);
-                   Object columnValue=rs.getObject(i+1);
-                   ReflectUtils.invokeSet(object,columnName,columnValue);
-                }
-                list.add(object);
+    public List queryRows( String sql, Class clazz,   Object[] params) {
+
+        final List list=new ArrayList();
+        executeQueryTemplate(sql, clazz, params, new CallBack() {
+            @Override
+            public Object doExecute(Connection conn, PreparedStatement ps, ResultSet rs) throws Exception{
+
+                ResultSetMetaData metaData = null;
+                    metaData = rs.getMetaData();
+                    while (rs.next()) {
+                        Object object = clazz.newInstance();
+                        for (int i = 0; i < metaData.getColumnCount(); i++) {
+                            String columnName = metaData.getColumnLabel(i + 1);
+                            Object columnValue = rs.getObject(i + 1);
+                            ReflectUtils.invokeSet(object, columnName, columnValue);
+                        }
+                        list.add(object);
+                    }
+                return list;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
         return list;
     }
 
@@ -110,21 +109,17 @@ public class MySqlQuery extends Query {
     @Override
     public Object queryValue(String sql, Object[] params) {
 
-        Connection conn = DBManager.getConn();
-        Object obj=null;
-        PreparedStatement ps=null;
-        ResultSet rs=null;
-        try {
-            ps=conn.prepareStatement(sql);
-            JDBCUtils.handleParamms(ps,params);
-            rs=ps.executeQuery();
-            while (rs.next()){
-                obj=rs.getObject(1);
+        return  executeQueryTemplate(sql, null, params, new CallBack() {
+            @Override
+            public Object doExecute(Connection conn, PreparedStatement ps, ResultSet rs) throws Exception {
+                Object obj=null;
+                ResultSetMetaData metaData = null;
+                while (rs.next()){
+                    obj=rs.getObject(1);
+                }
+                return obj;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return obj;
+        });
     }
 
     @Override

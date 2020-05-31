@@ -2,13 +2,34 @@ package cn.thf.sorm.core;
 
 import cn.thf.sorm.bean.TableInfo;
 import cn.thf.sorm.utils.JDBCUtils;
+import cn.thf.sorm.utils.ReflectUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("all")
 public abstract class Query {
+    public Object executeQueryTemplate(String sql,Class clazz,Object[] params,CallBack back){
+        Connection conn = DBManager.getConn();
+        List list=new ArrayList();
+        PreparedStatement ps=null;
+        ResultSet rs=null;
+        try {
+            ps=conn.prepareStatement(sql);
+            JDBCUtils.handleParamms(ps,params);
+            rs=ps.executeQuery();
+           return back.doExecute(conn,ps,rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }finally {
+            DBManager.close(ps,conn);
+        }
+    }
     /**
      * 直接执行 sql
      * @param spl
