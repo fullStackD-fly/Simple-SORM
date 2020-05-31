@@ -20,8 +20,10 @@ public class ReflectUtils {
     }
     public static  void  invokeSet(Object obj,String fieldname,Object fieldValue){
         try {
-            Method m= obj.getClass().getMethod("set"+ StringUtils.firstChar2UpperCase(fieldname),fieldValue.getClass());
-            m.invoke(obj,fieldValue);
+            if(fieldValue!=null) {
+                Method m = obj.getClass().getMethod("set" + StringUtils.firstChar2UpperCase(fieldname), fieldValue.getClass());
+                m.invoke(obj, fieldValue);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

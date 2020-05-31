@@ -12,7 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("all")
-public abstract class Query {
+public abstract class Query implements Cloneable{
+    @Override
+    protected Object clone()
+    {
+        try
+        {
+           return super.clone();
+        } catch (CloneNotSupportedException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public Object executeQueryTemplate(String sql,Class clazz,Object[] params,CallBack back){
         Connection conn = DBManager.getConn();
         List list=new ArrayList();
@@ -94,6 +107,14 @@ public abstract class Query {
     public abstract List queryRows (String sql,Class clazz ,Object[] params);
 
     /**
+     *
+     * @param clazz
+     * @param id
+     * @return
+     */
+    public abstract Object queryById (Class clazz ,Object id);
+
+    /**
      * 单记录
      * @param sql
      * @param clazz
@@ -117,4 +138,5 @@ public abstract class Query {
      * @return
      */
     public abstract Number queryNumber(String sql,Object[] params);
+
 }

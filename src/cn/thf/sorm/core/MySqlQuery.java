@@ -101,6 +101,14 @@ public class MySqlQuery extends Query {
     }
 
     @Override
+    public Object queryById(Class clazz, Object id) {
+        TableInfo tableInfo =TableContext.poClassTableMap.get(clazz);
+        String sql= String.format("select * from %s where %s=?", tableInfo.getTname(), tableInfo.getOnlyPriKey().getName());
+        queryOne(sql,clazz,new Object[]{id});
+        return null;
+    }
+
+    @Override
     public Object queryOne(String sql, Class clazz, Object[] params) {
         List list = queryRows(sql, clazz, params);
         return (list==null||list.size()==0)?null:list.get(0);

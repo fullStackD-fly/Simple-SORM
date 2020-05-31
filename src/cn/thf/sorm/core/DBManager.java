@@ -63,7 +63,7 @@ public class DBManager {
         try {
             Class.forName(conf.getDriver());
             return DriverManager.getConnection(conf.getUrl(),
-                    conf.getUser(),conf.getPwd());     //直接建立连接，后期增加连接池处理，提高效率！！！
+                    conf.getUser(),conf.getPwd());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
